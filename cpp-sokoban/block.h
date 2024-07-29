@@ -22,28 +22,31 @@ public:
     void set_col(int c) { this->col = c; }
     int get_row() const { return this->row; }
     int get_col() const { return this->col; }
-    virtual bool is_pushable(table const& tbl, block const& other) = 0;
+    virtual void move(table& tbl, std::pair<int, int> const& dir) = 0;
+    virtual bool is_movable(table& tbl, std::pair<int, int> const& dir) const = 0;
     virtual char get_char() const = 0;
 };
 
 class player : public block {
 public:
     player(int r, int c) : block(r, c) {}
-    bool is_pushable(table const& tbl, block const& other) override { return false; }
+    void move(table& tbl, std::pair<int, int> const& dir) override;
+    bool is_movable(table& tbl, std::pair<int, int> const& dir) const override;
     char get_char() const override { return PLAYER; }
-    void move(table& tbl, std::pair<int, int> const& dir);
 };
 
 class wall : public block {
 public:
     wall(int r, int c) : block(r, c) {}
-    bool is_pushable(table const& tbl, block const& other) override { return false; }
+    void move(table& tbl, std::pair<int, int> const& dir) override { return; }
+    bool is_movable(table& tbl, std::pair<int, int> const& dir) const override { return false; }
     char get_char() const override { return WALL; }
 };
 
 class box : public block {
 public:
     box(int r, int c) : block(r, c) {}
-    bool is_pushable(table const& tbl, block const& other) override;
+    void move(table& tbl, std::pair<int, int> const& dir) override;
+    bool is_movable(table& tbl, std::pair<int, int> const& dir) const override;
     char get_char() const override { return BOX; }
 };

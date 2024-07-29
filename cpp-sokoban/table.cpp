@@ -9,14 +9,14 @@ void gotorc(int r, int c);
 table::table(int const h, int const w, vector<string> const& data)
     : height(h), width(w), ptr_player(nullptr) {
     if (h < 0 || h > MAX_MAP_HEIGHT || w < 0 || w > MAX_MAP_WIDTH)
-        this->invalid_flag = true;
+        this->is_invalid = true;
     for (int row = 0; row < h; row++) {
         vector<block *> v;
         for (int col = 0; col < w; col++) {
             switch (data[row][col]) {
             case PLAYER:
                 if (this->ptr_player != nullptr) {
-                    this->invalid_flag = true;
+                    this->is_invalid = true;
                     v.push_back(nullptr);
                 }
                 else {
@@ -36,7 +36,7 @@ table::table(int const h, int const w, vector<string> const& data)
                 break;
             case PLAYER_S:
                 if (this->ptr_player != nullptr) {
-                    this->invalid_flag = true;
+                    this->is_invalid = true;
                     v.push_back(nullptr);
                 }
                 else {
@@ -53,7 +53,7 @@ table::table(int const h, int const w, vector<string> const& data)
                 v.push_back(nullptr);
                 break;
             default:
-                this->invalid_flag = false;   // error occur
+                this->is_invalid = false;   // error occur
             }
         }
         this->map.push_back(v);
@@ -61,18 +61,18 @@ table::table(int const h, int const w, vector<string> const& data)
 }
 
 void table::draw_table() const {
-    if (this->invalid_flag) {
+    if (this->is_invalid) {
         cout << "INVALID MAP DATA" << '\n';
         return;
     }
     for (int row = 0; row < this->height; row++) {
+        gotorc(row, 0);
         for (int col = 0; col < this->width; col++) {
             if (this->map[row][col] == nullptr)
                 cout << FREE;
             else
                 cout << this->map[row][col]->get_char();
         }
-        cout << '\n';
     }
 
     CONSOLE_SCREEN_BUFFER_INFO previous_cur;

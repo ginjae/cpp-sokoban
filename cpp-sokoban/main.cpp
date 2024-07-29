@@ -7,18 +7,18 @@
 #include "block.h"
 #include "table.h"
 
+
+#define MAGIC_KEY   224
+#define KEY_UP      72
+#define KEY_DOWN    80
+#define KEY_LEFT    75
+#define KEY_RIGHT   77
+
+
 #define UP      0
 #define DOWN    1
 #define LEFT    2
 #define RIGHT   3
-
-#define MAGIC_KEY   224
-enum keyboard {
-    up = 72,
-    down = 80,
-    left = 75,
-    right = 77
-};
 
 using namespace std;
 
@@ -30,10 +30,10 @@ pair<int, int> dirs[4] = {
 };
 
 
-
 void gotorc(int r, int c);
 
-string manual[] = {
+
+const string MANUAL[] = {
     "+-------------------------------------------------+",
     "| '#' - a wall                                    |",
     "| ' ' - free square                               |",
@@ -65,23 +65,23 @@ void init(vector<string> const& path_stages) {
     for (size_t i = 0; i <= path_stages.size() + 1; i++) {
         gotorc((int)i, MAX_MAP_WIDTH + 2);
         if (i == 0)
-            cout << "+" << string(8, '-') << "STAGES" << string(8, '-') << "+";
+            cout << "+" << string(5, '-') << "STAGES" << string(5, '-') << "+";
         else if (i == path_stages.size() + 1)
-            cout << "+" << string(22, '-') << "+";
+            cout << "+" << string(16, '-') << "+";
         else {
-            string s = path_stages[i - 1].substr(path_stages[i - 1].find("stages") + 7, 21);
-            if (s.size() > 20)
-                s = s.substr(0, 16) + "... ";
+            string s = path_stages[i - 1].substr(path_stages[i - 1].find("stages") + 7, 15);
+            if (s.size() > 14)
+                s = s.substr(0, 10) + "... ";
             else
-                while (s.size() < 20)
+                while (s.size() < 14)
                     s += " ";
             cout << "|  " << s << "|";
         }
     }
 
-    for (size_t i = 0; i < sizeof manual / sizeof manual[0]; i++) {
-        gotorc((int)i, MAX_MAP_WIDTH + 27);
-        cout << manual[i];
+    for (size_t i = 0; i < sizeof MANUAL / sizeof MANUAL[0]; i++) {
+        gotorc((int)i, MAX_MAP_WIDTH + 21);
+        cout << MANUAL[i];
     }
     gotorc(0, 0);
 }
@@ -118,6 +118,8 @@ int main() {
             for (int i = 0; i < height; i++) {
                 string str;
                 getline(readFile, str);
+                if (str.size() > height)
+                    str.substr(0, height);
                 while (str.size() < width) {
                     str += ' ';
                 }
@@ -138,16 +140,16 @@ int main() {
         input = _getch();
         if (input == MAGIC_KEY) {
             switch (_getch()) {
-            case keyboard::up:
+            case KEY_UP:
                 t->get_player()->move(*t, dirs[UP]);
                 break;
-            case keyboard::down:
+            case KEY_DOWN:
                 t->get_player()->move(*t, dirs[DOWN]);
                 break;
-            case keyboard::left:
+            case KEY_LEFT:
                 t->get_player()->move(*t, dirs[LEFT]);
                 break;
-            case keyboard::right:
+            case KEY_RIGHT:
                 t->get_player()->move(*t, dirs[RIGHT]);
                 break;
             }
@@ -155,9 +157,10 @@ int main() {
         else if (input == 114) {    // r
             delete t;
 
-            gotorc(0, 0);
-            for (int i = 0; i <= MAX_MAP_HEIGHT; i++)
-                cout << string(MAX_MAP_WIDTH, ' ') << '\n';
+            for (int i = 0; i <= MAX_MAP_HEIGHT; i++) {
+                gotorc(i, 0);
+                cout << string(MAX_MAP_WIDTH, ' ');
+            }
 
             gotorc(0, 0);
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
@@ -170,9 +173,10 @@ int main() {
                 continue;
             delete t;
 
-            gotorc(0, 0);
-            for (int i = 0; i <= MAX_MAP_HEIGHT; i++)
-                cout << string(MAX_MAP_WIDTH, ' ') << '\n';
+            for (int i = 0; i <= MAX_MAP_HEIGHT; i++) {
+                gotorc(i, 0);
+                cout << string(MAX_MAP_WIDTH, ' ');
+            }
 
             gotorc(current_stage + 1, MAX_MAP_WIDTH + 3);
             cout << "  ";
@@ -191,9 +195,10 @@ int main() {
                 continue;
             delete t;
 
-            gotorc(0, 0);
-            for (int i = 0; i <= MAX_MAP_HEIGHT; i++)
-                cout << string(MAX_MAP_WIDTH, ' ') << '\n';
+            for (int i = 0; i <= MAX_MAP_HEIGHT; i++) {
+                gotorc(i, 0);
+                cout << string(MAX_MAP_WIDTH, ' ');
+            }
 
             gotorc(current_stage + 1, MAX_MAP_WIDTH + 3);
             cout << "  ";
