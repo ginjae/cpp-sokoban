@@ -12,30 +12,38 @@ void gotorc(int r, int c) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cur);
 }
 
-void player::move(table& tbl, pair<int, int> const& dir) {
+bool player::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
+    bool ret = false;
     if (this->is_movable(tbl, dir)) {
         int new_row = this->row + dir.first,
             new_col = this->col + dir.second;
         block* dest = tbl.get_block(new_row, new_col);
-        if (dest != nullptr && dest->is_movable(tbl, dir))
-            dest->move(tbl, dir);
+        if (dest != nullptr && dest->is_movable(tbl, dir)) {
+            dest->move(tbl, dir, update_flag);
+            ret = true;
+        }
 
         tbl.set_block(new_row, new_col, this);
-        gotorc(new_row, new_col);
-        if (tbl.has_storage_at(new_row, new_col))
-            cout << PLAYER_S;
-        else
-            cout << PLAYER;
+        if (update_flag) {
+            gotorc(new_row, new_col);
+            if (tbl.has_storage_at(new_row, new_col))
+                cout << PLAYER_S;
+            else
+                cout << PLAYER;
+        }
 
         tbl.set_block(this->row, this->col, nullptr);
-        gotorc(this->row, this->col);
-        if (tbl.has_storage_at(this->row, this->col))
-            cout << STORAGE;
-        else
-            cout << FREE;
+        if (update_flag) {
+            gotorc(this->row, this->col);
+            if (tbl.has_storage_at(this->row, this->col))
+                cout << STORAGE;
+            else
+                cout << FREE;
+        }
         this->row = new_row;
         this->col = new_col;
     }
+    return ret;
 }
 
 bool player::is_movable(table& tbl, pair<int, int> const& dir) const {
@@ -51,31 +59,41 @@ bool player::is_movable(table& tbl, pair<int, int> const& dir) const {
     return false;
 }
 
-void box::move(table& tbl, pair<int, int> const& dir) {
+bool box::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
     if (this->is_movable(tbl, dir)) {
         int new_row = this->row + dir.first,
             new_col = this->col + dir.second;
         tbl.set_block(new_row, new_col, this);
-        gotorc(new_row, new_col);
-        if (tbl.has_storage_at(new_row, new_col))
-            cout << BOX_S;
-        else
-            cout << BOX;
+        if (update_flag) {
+            gotorc(new_row, new_col);
+            if (tbl.has_storage_at(new_row, new_col))
+                cout << BOX_S;
+            else
+                cout << BOX;
+        }
 
         tbl.set_block(this->row, this->col, nullptr);
-        gotorc(this->row, this->col);
-        if (tbl.has_storage_at(this->row, this->col))
-            cout << STORAGE;
-        else
-            cout << FREE;
+        if (update_flag) {
+            gotorc(this->row, this->col);
+            if (tbl.has_storage_at(this->row, this->col))
+                cout << STORAGE;
+            else
+                cout << FREE;
+        }
         this->row = new_row;
         this->col = new_col;
 
-        if (tbl.is_solved()) {
+        if (update_flag) {
             gotorc(tbl.get_height(), 0);
-            cout << "CLEAR";
+            if (tbl.is_solved())
+                cout << "CLEAR";
+            else if (tbl.is_stuck())
+                cout << "STUCK";
+            else
+                cout << "     ";
         }
     }
+    return false;
 }
 
 bool box::is_movable(table& tbl, pair<int, int> const& dir) const {

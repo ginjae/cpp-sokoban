@@ -16,17 +16,17 @@
 
 
 #define UP      0
-#define DOWN    1
-#define LEFT    2
-#define RIGHT   3
+#define RIGHT   1
+#define DOWN    2
+#define LEFT    3
 
 using namespace std;
 
 pair<int, int> dirs[4] = {
     make_pair(-1, 0),   // UP
+    make_pair(0, 1),    // RIGHT
     make_pair(1, 0),    // DOWN
-    make_pair(0, -1),   // LEFT
-    make_pair(0, 1)     // RIGHT
+    make_pair(0, -1)    // LEFT
 };
 
 
@@ -48,6 +48,7 @@ const string MANUAL[] = {
     "| [r] - restart the stage                         |",
     "| [n] - go to next stage                          |",
     "| [b] - go to previous stage                      |",
+    "| [s] - solve the stage                           |",
     "| [e] - exit                                      |",
     "+-------------------------------------------------+"
 };
@@ -139,6 +140,10 @@ int main() {
     while (1) {
         input = _getch();
         if (input == MAGIC_KEY) {
+            if (t->is_invalid) {
+                _getch();
+                continue;
+            }
             switch (_getch()) {
             case KEY_UP:
                 t->get_player()->move(*t, dirs[UP]);
@@ -212,6 +217,37 @@ int main() {
             gotorc(0, 0);
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
             t->draw_table();
+        }
+        else if (input == 115) {
+            delete t;
+            t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
+            for (int i = 0; i <= MAX_MAP_HEIGHT; i++) {
+                gotorc(i, 0);
+                cout << string(MAX_MAP_WIDTH, ' ');
+            }
+            t->draw_table();
+            gotorc(t->get_height() + 1, 0);
+            cout << "CALCULATING...";
+            string answer = t->solve_bfs();
+            gotorc(t->get_height() + 1, 0);
+            if (answer == "NO ANSWER") {
+                cout << "              ";
+                continue;
+            }
+            cout << "SOLVING...    ";
+            for (char c : answer) {
+                if (c == 'U')
+                    t->get_player()->move(*t, dirs[UP]);
+                else if (c == 'D')
+                    t->get_player()->move(*t, dirs[DOWN]);
+                else if (c == 'L')
+                    t->get_player()->move(*t, dirs[LEFT]);
+                else
+                    t->get_player()->move(*t, dirs[RIGHT]);
+                Sleep(500);
+            }
+            gotorc(t->get_height() + 1, 0);
+            cout << "              ";
         }
 //        else
 //            cout << input << endl;
