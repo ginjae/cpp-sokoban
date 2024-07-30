@@ -225,13 +225,16 @@ int main() {
                 gotorc(i, 0);
                 cout << string(MAX_MAP_WIDTH, ' ');
             }
+            gotorc(0, 0);
             t->draw_table();
+            if (t->is_invalid)
+                continue;
             gotorc(t->get_height() + 1, 0);
             cout << "CALCULATING...";
             string answer = t->solve_bfs();
             gotorc(t->get_height() + 1, 0);
-            if (answer == "NO ANSWER") {
-                cout << "              ";
+            if (answer == "NO SOLUTION") {
+                cout << "NO SOLUTION   ";
                 continue;
             }
             cout << "SOLVING...    ";
