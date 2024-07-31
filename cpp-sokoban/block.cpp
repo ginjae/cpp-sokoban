@@ -3,25 +3,20 @@
 #include <iostream>
 #include <Windows.h>
 
+
 using namespace std;
 
-void gotorc(int r, int c) {
-    COORD cur;
-    cur.X = c;
-    cur.Y = r;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cur);
-}
 
-bool player::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
-    bool ret = false;
+void gotorc(int r, int c);
+
+
+void player::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
     if (this->is_movable(tbl, dir)) {
         int new_row = this->row + dir.first,
             new_col = this->col + dir.second;
         block* dest = tbl.get_block(new_row, new_col);
-        if (dest != nullptr && dest->is_movable(tbl, dir)) {
+        if (dest != nullptr && dest->is_movable(tbl, dir))
             dest->move(tbl, dir, update_flag);
-            ret = true;
-        }
 
         tbl.set_block(new_row, new_col, this);
         if (update_flag) {
@@ -43,7 +38,6 @@ bool player::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
         this->row = new_row;
         this->col = new_col;
     }
-    return ret;
 }
 
 bool player::is_movable(table& tbl, pair<int, int> const& dir) const {
@@ -59,7 +53,7 @@ bool player::is_movable(table& tbl, pair<int, int> const& dir) const {
     return false;
 }
 
-bool box::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
+void box::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
     if (this->is_movable(tbl, dir)) {
         int new_row = this->row + dir.first,
             new_col = this->col + dir.second;
@@ -93,7 +87,6 @@ bool box::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
                 cout << "     ";
         }
     }
-    return false;
 }
 
 bool box::is_movable(table& tbl, pair<int, int> const& dir) const {

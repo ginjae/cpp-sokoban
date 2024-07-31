@@ -14,13 +14,8 @@
 #define KEY_LEFT    75
 #define KEY_RIGHT   77
 
-
-#define UP      0
-#define RIGHT   1
-#define DOWN    2
-#define LEFT    3
-
 using namespace std;
+
 
 pair<int, int> dirs[4] = {
     make_pair(-1, 0),   // UP
@@ -29,8 +24,30 @@ pair<int, int> dirs[4] = {
     make_pair(0, -1)    // LEFT
 };
 
+constexpr int UP = 0;
+constexpr int RIGHT = 1;
+constexpr int DOWN = 2;
+constexpr int LEFT = 3;
 
-void gotorc(int r, int c);
+char dir_to_char(pair<int, int> const& dir) {
+    if (dir == dirs[UP])
+        return 'U';
+    if (dir == dirs[RIGHT])
+        return 'R';
+    if (dir == dirs[DOWN])
+        return 'D';
+    if (dir == dirs[LEFT])
+        return 'L';
+    return '?';
+}
+
+
+void gotorc(int r, int c) {
+    COORD cur;
+    cur.X = c;
+    cur.Y = r;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cur);
+}
 
 
 const string MANUAL[] = {

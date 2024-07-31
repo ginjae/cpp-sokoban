@@ -8,6 +8,8 @@ using namespace std;
 
 void gotorc(int r, int c);
 extern pair<int, int> dirs[4];
+extern int UP, RIGHT, DOWN, LEFT;
+char dir_to_char(pair<int, int> const& dir);
 
 table::table(int const h, int const w, vector<string> const& data)
     : height(h), width(w), ptr_player(nullptr) {
@@ -203,93 +205,6 @@ bool table::is_stuck() const {
         return false;
 }
 
-//string table::solve_bfs() const {
-//    if (this->is_invalid || this->ptr_player == nullptr)
-//        return "INVALID MAP DATA";
-//
-//    struct state {
-//        table t;
-//        pair<int, int> dir;
-//        vector<pair<int, int>> prev_pos;
-//        vector<bool> prev_result;
-//    };
-//
-//    table t = *this;
-//    queue<state*> q;
-//    for (auto d : dirs)
-//        if (t.ptr_player->is_movable(t, d)) {
-//            vector<pair<int, int>> pos;
-//            pos.push_back(make_pair(t.ptr_player->get_row(), t.ptr_player->get_col()));
-//            state* next_state = new state{ t, d, pos, {} };
-//            next_state.prev_result.push_back(next_state.t.ptr_player->move(next_state.t, d, false));
-//            q.push(next_state);
-//        }
-//
-//    while (!q.empty()) {
-//        state* cur_state = q.front();
-//        if (cur_state.t.is_solved()) {
-//            string result;
-//            for (size_t i = 1; i <= cur_state.prev_pos.size(); i++) {
-//                int vertical, horizontal;
-//                if (i == cur_state.prev_pos.size()) {
-//                    vertical = cur_state.t.get_player()->get_row() - cur_state.prev_pos[i - 1].first;
-//                    horizontal = cur_state.t.get_player()->get_col() - cur_state.prev_pos[i - 2].second;
-//                }
-//                else {
-//                    vertical = cur_state.prev_pos[i].first - cur_state.prev_pos[i - 1].first;
-//                    horizontal = cur_state.prev_pos[i].second - cur_state.prev_pos[i - 1].second;
-//                }
-//                if (vertical == 0) {
-//                    if (horizontal == 1)
-//                        result += 'R';
-//                    else
-//                        result += 'L';
-//                }
-//                else if (vertical == -1)
-//                    result += 'U';
-//                else
-//                    result += 'D';
-//            }
-//            while (!q.empty()) {
-//                delete q.front();
-//                q.pop();
-//            }
-//            return result;
-//        }
-//        if (cur_state.t.is_stuck()) {
-//            delete q.front();
-//            q.pop();
-//            continue;
-//        }
-//        size_t idx = find(cur_state.prev_pos.begin(), cur_state.prev_pos.end(),
-//            make_pair(cur_state.t.ptr_player->get_row(), cur_state.t.ptr_player->get_col())) - cur_state.prev_pos.begin();
-//        if (idx < cur_state.prev_pos.size()) {
-//            size_t i;
-//            for (i = idx; i < cur_state.prev_result.size(); i++)
-//                if (cur_state.prev_result[i])
-//                    break;
-//            if (i == cur_state.prev_result.size()) {
-//                delete q.front();
-//                q.pop();
-//                continue;
-//            }
-//        }
-//        for (auto d : dirs)
-//            if (cur_state.t.ptr_player->is_movable(cur_state.t, d)) {
-//                state* next_state = new state{ cur_state.t, d, cur_state.prev_pos, cur_state.prev_result };
-//                next_state.prev_result.push_back(next_state.t.ptr_player->move(next_state.t, d, false));
-//                next_state.prev_pos.push_back(make_pair(cur_state.t.ptr_player->get_row(), cur_state.t.ptr_player->get_col()));
-//                q.push(next_state);
-//            }
-//        //cout << cur_state.t.get_player()->get_row() << ", " << cur_state.t.get_player()->get_col() << endl;
-//        delete q.front();
-//        q.pop();
-//    }
-//
-//    return "NO SOLUTION";
-//}
-//
-
 string table::get_string() const {
     string s;
     for (int row = 0; row < this->height; row++)
@@ -302,84 +217,6 @@ string table::get_string() const {
     return s;
 }
 
-//string table::solve_bfs() const {
-//    if (this->is_invalid || this->ptr_player == nullptr)
-//        return "INVALID MAP DATA";
-//
-//    struct state {
-//        table t;
-//        pair<int, int> dir;
-//        vector<pair<int, int>> prev_pos;
-//        vector<bool> prev_result;
-//    };
-//
-//    table t = *this;
-//    queue<state> q;
-//    unordered_set<string> visited;
-//
-//    for (auto d : dirs) {
-//        if (t.ptr_player->is_movable(t, d)) {
-//            vector<pair<int, int>> pos;
-//            pos.push_back(make_pair(t.ptr_player->get_row(), t.ptr_player->get_col()));
-//            state next_state = { t, d, pos, {} };
-//            next_state.prev_result.push_back(next_state.t.ptr_player->move(next_state.t, d, false));
-//            q.push(next_state);
-//            visited.insert(next_state.t.get_string());
-//        }
-//    }
-//
-//    while (!q.empty()) {
-//        state& cur_state = q.front();
-//        if (cur_state.t.is_solved()) {
-//            string result;
-//            for (size_t i = 1; i <= cur_state.prev_pos.size(); i++) {
-//                int vertical, horizontal;
-//                if (i == cur_state.prev_pos.size()) {
-//                    vertical = cur_state.t.get_player()->get_row() - cur_state.prev_pos[i - 1].first;
-//                    horizontal = cur_state.t.get_player()->get_col() - cur_state.prev_pos[i - 2].second;
-//                }
-//                else {
-//                    vertical = cur_state.prev_pos[i].first - cur_state.prev_pos[i - 1].first;
-//                    horizontal = cur_state.prev_pos[i].second - cur_state.prev_pos[i - 1].second;
-//                }
-//                if (vertical == 0) {
-//                    if (horizontal == 1)
-//                        result += 'R';
-//                    else
-//                        result += 'L';
-//                }
-//                else if (vertical == -1)
-//                    result += 'U';
-//                else
-//                    result += 'D';
-//            }
-//            return result;
-//        }
-//        if (cur_state.t.is_stuck()) {
-//            q.pop();
-//            continue;
-//        }
-//
-//        for (auto d : dirs) {
-//            if (cur_state.t.ptr_player->is_movable(cur_state.t, d)) {
-//                state next_state = { cur_state.t, d, cur_state.prev_pos, cur_state.prev_result };
-//                next_state.prev_result.push_back(next_state.t.ptr_player->move(next_state.t, d, false));
-//                next_state.prev_pos.push_back(make_pair(cur_state.t.ptr_player->get_row(), cur_state.t.ptr_player->get_col()));
-//                string table_string = next_state.t.get_string();
-//                if (visited.find(table_string) == visited.end()) {
-//                    q.push(next_state);
-//                    visited.insert(table_string);
-//                }
-//            }
-//        }
-//
-//        q.pop();
-//    }
-//
-//    return "NO SOLUTION";
-//}
-//
-
 string table::solve_bfs() const {
     if (this->is_invalid || this->ptr_player == nullptr)
         return "INVALID MAP DATA";
@@ -387,8 +224,7 @@ string table::solve_bfs() const {
     struct state {
         table t;
         pair<int, int> dir;
-        vector<pair<int, int>> prev_pos;
-        vector<bool> prev_result;
+        string log;
     };
 
     table t = *this;
@@ -397,10 +233,7 @@ string table::solve_bfs() const {
 
     for (auto d : dirs) {
         if (t.ptr_player->is_movable(t, d)) {
-            vector<pair<int, int>> pos;
-            pos.push_back(make_pair(t.ptr_player->get_row(), t.ptr_player->get_col()));
-            state* next_state = new state{ t, d, pos, {} };
-            next_state->prev_result.push_back(next_state->t.ptr_player->move(next_state->t, d, false));
+            state* next_state = new state{ t, d, "" };
             q.push(next_state);
             visited.insert(next_state->t.get_string());
         }
@@ -409,28 +242,7 @@ string table::solve_bfs() const {
     while (!q.empty()) {
         state* cur_state = q.front();
         if (cur_state->t.is_solved()) {
-            string result;
-            for (size_t i = 1; i <= cur_state->prev_pos.size(); i++) {
-                int vertical, horizontal;
-                if (i == cur_state->prev_pos.size()) {
-                    vertical = cur_state->t.get_player()->get_row() - cur_state->prev_pos[i - 1].first;
-                    horizontal = cur_state->t.get_player()->get_col() - cur_state->prev_pos[i - 2].second;
-                }
-                else {
-                    vertical = cur_state->prev_pos[i].first - cur_state->prev_pos[i - 1].first;
-                    horizontal = cur_state->prev_pos[i].second - cur_state->prev_pos[i - 1].second;
-                }
-                if (vertical == 0) {
-                    if (horizontal == 1)
-                        result += 'R';
-                    else
-                        result += 'L';
-                }
-                else if (vertical == -1)
-                    result += 'U';
-                else
-                    result += 'D';
-            }
+            string result = cur_state->log;
             while (!q.empty()) {
                 delete q.front();
                 q.pop();
@@ -445,9 +257,9 @@ string table::solve_bfs() const {
 
         for (auto d : dirs) {
             if (cur_state->t.ptr_player->is_movable(cur_state->t, d)) {
-                state* next_state = new state{ cur_state->t, d, cur_state->prev_pos, cur_state->prev_result };
-                next_state->prev_result.push_back(next_state->t.ptr_player->move(next_state->t, d, false));
-                next_state->prev_pos.push_back(make_pair(cur_state->t.ptr_player->get_row(), cur_state->t.ptr_player->get_col()));
+                state* next_state = new state{ cur_state->t, d, cur_state->log };
+                next_state->t.ptr_player->move(next_state->t, d, false);
+                next_state->log += dir_to_char(d);
                 string table_string = next_state->t.get_string();
                 if (visited.find(table_string) == visited.end()) {
                     q.push(next_state);
@@ -457,7 +269,6 @@ string table::solve_bfs() const {
                     delete next_state;
             }
         }
-
         delete q.front();
         q.pop();
     }
