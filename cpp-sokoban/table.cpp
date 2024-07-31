@@ -231,13 +231,9 @@ string table::solve_bfs() const {
     queue<state*> q;
     unordered_set<string> visited;
 
-    for (auto d : dirs) {
-        if (t.ptr_player->is_movable(t, d)) {
-            state* next_state = new state{ t, d, "" };
-            q.push(next_state);
-            visited.insert(next_state->t.get_string());
-        }
-    }
+    state* next_state = new state{ t, dirs[0], ""};
+    q.push(next_state);
+    visited.insert(next_state->t.get_string());
 
     while (!q.empty()) {
         state* cur_state = q.front();

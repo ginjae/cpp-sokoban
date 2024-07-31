@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <conio.h>
 #include <filesystem>
+#include <ctime>
 #include "block.h"
 #include "table.h"
 
@@ -136,8 +137,8 @@ int main() {
             for (int i = 0; i < height; i++) {
                 string str;
                 getline(readFile, str);
-                if (str.size() > height)
-                    str.substr(0, height);
+                if (str.size() > width)
+                    str = str.substr(0, width);
                 while (str.size() < width) {
                     str += ' ';
                 }
@@ -158,7 +159,7 @@ int main() {
         input = _getch();
         if (input == MAGIC_KEY) {
             if (t->is_invalid) {
-                _getch();
+                int discard = _getch();
                 continue;
             }
             switch (_getch()) {
@@ -179,7 +180,7 @@ int main() {
         else if (input == 114) {    // r
             delete t;
 
-            for (int i = 0; i <= MAX_MAP_HEIGHT; i++) {
+            for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
                 gotorc(i, 0);
                 cout << string(MAX_MAP_WIDTH, ' ');
             }
@@ -195,7 +196,7 @@ int main() {
                 continue;
             delete t;
 
-            for (int i = 0; i <= MAX_MAP_HEIGHT; i++) {
+            for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
                 gotorc(i, 0);
                 cout << string(MAX_MAP_WIDTH, ' ');
             }
@@ -217,7 +218,7 @@ int main() {
                 continue;
             delete t;
 
-            for (int i = 0; i <= MAX_MAP_HEIGHT; i++) {
+            for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
                 gotorc(i, 0);
                 cout << string(MAX_MAP_WIDTH, ' ');
             }
@@ -238,7 +239,7 @@ int main() {
         else if (input == 115) {
             delete t;
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
-            for (int i = 0; i <= MAX_MAP_HEIGHT; i++) {
+            for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
                 gotorc(i, 0);
                 cout << string(MAX_MAP_WIDTH, ' ');
             }
@@ -248,13 +249,15 @@ int main() {
                 continue;
             gotorc(t->get_height() + 1, 0);
             cout << "CALCULATING...";
+            clock_t start = clock();
             string answer = t->solve_bfs();
+            clock_t end = clock();
             gotorc(t->get_height() + 1, 0);
+            cout << "duration: " << (double)(end - start) / CLOCKS_PER_SEC << "s";
             if (answer == "NO SOLUTION") {
                 cout << "NO SOLUTION   ";
                 continue;
             }
-            cout << "SOLVING...    ";
             for (char c : answer) {
                 if (c == 'U')
                     t->get_player()->move(*t, dirs[UP]);
@@ -264,10 +267,9 @@ int main() {
                     t->get_player()->move(*t, dirs[LEFT]);
                 else
                     t->get_player()->move(*t, dirs[RIGHT]);
-                Sleep(500);
+                Sleep(300);
             }
             gotorc(t->get_height() + 1, 0);
-            cout << "              ";
         }
 //        else
 //            cout << input << endl;
