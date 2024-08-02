@@ -7,6 +7,7 @@
 #include <ctime>
 #include "block.h"
 #include "table.h"
+#include "solver.h"
 
 
 #define MAGIC_KEY   224
@@ -19,10 +20,10 @@ using namespace std;
 
 
 pair<int, int> dirs[4] = {
-    make_pair(-1, 0),   // UP
-    make_pair(0, 1),    // RIGHT
-    make_pair(1, 0),    // DOWN
-    make_pair(0, -1)    // LEFT
+    {-1, 0},   // UP
+    {0, 1},    // RIGHT
+    {1, 0},    // DOWN
+    {0, -1}    // LEFT
 };
 
 constexpr int UP = 0;
@@ -236,7 +237,7 @@ int main() {
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
             t->draw_table();
         }
-        else if (input == 115) {
+        else if (input == 115) {    // s
             delete t;
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
             for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
@@ -249,11 +250,13 @@ int main() {
                 continue;
             gotorc(t->get_height() + 1, 0);
             cout << "CALCULATING...";
-            clock_t start = clock();
-            string answer = t->solve_bfs();
-            clock_t end = clock();
+            solver s(stages_data[current_stage]);
+            clock_t solver_start = clock();
+            string answer = s.solve_bfs();
+            clock_t solver_end = clock();
             gotorc(t->get_height() + 1, 0);
-            cout << "duration: " << (double)(end - start) / CLOCKS_PER_SEC << "s";
+            cout << "duration: " << (double)(solver_end - solver_start) / CLOCKS_PER_SEC << "s";
+            gotorc(t->get_height() + 2, 0);
             if (answer == "NO SOLUTION") {
                 cout << "NO SOLUTION   ";
                 continue;

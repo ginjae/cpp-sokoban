@@ -8,7 +8,6 @@ using namespace std;
 
 void gotorc(int r, int c);
 extern pair<int, int> dirs[4];
-extern int UP, RIGHT, DOWN, LEFT;
 char dir_to_char(pair<int, int> const& dir);
 
 table::table(int const h, int const w, vector<string> const& data)
@@ -37,7 +36,7 @@ table::table(int const h, int const w, vector<string> const& data)
                 v.push_back(new box(row, col));
                 break;
             case STORAGE:
-                this->storages.push_back(make_pair(row, col));
+                this->storages.push_back({ row, col });
                 v.push_back(nullptr);
                 break;
             case PLAYER_S:
@@ -50,10 +49,10 @@ table::table(int const h, int const w, vector<string> const& data)
                     this->is_invalid = false;
                     v.push_back(this->ptr_player);
                 }
-                this->storages.push_back(make_pair(row, col));
+                this->storages.push_back({ row, col });
                 break;
             case BOX_S:
-                this->storages.push_back(make_pair(row, col));
+                this->storages.push_back({ row, col });
                 v.push_back(new box(row, col));
                 break;
             case FREE:
@@ -173,101 +172,101 @@ bool table::is_solved() const {
     return true;
 }
 
-bool table::is_stuck() const {
-    size_t num_boxes = 0;
-    for (int row = 0; row < this->height; row++)
-        for (int col = 0; col < this->width; col++) {
-            if (this->map[row][col] == nullptr || this->map[row][col]->get_char() != BOX)
-                continue;
-            num_boxes++;
-            if (this->has_storage_at(row, col))
-                continue;
-            bool unmovable = false;
-            for (int i = 0; i < 5; i++) {
-                int new_row = row + dirs[i % 4].first,
-                    new_col = col + dirs[i % 4].second;
-                if (new_row < 0 || new_row >= this->height || new_col < 0 || new_col >= this->width ||
-                        (this->map[new_row][new_col] != nullptr && this->map[new_row][new_col]->get_char() == WALL)) {
-                    if (unmovable) {
-                        num_boxes--;
-                        break;
-                    }
-                    else
-                        unmovable = true;
-                }
-                else
-                    unmovable = false;
-            }
-        }
-    if (num_boxes < this->storages.size())
-        return true;
-    else
-        return false;
-}
-
-string table::get_string() const {
-    string s;
-    for (int row = 0; row < this->height; row++)
-        for (int col = 0; col < this->width; col++) {
-            if (this->map[row][col] == nullptr)
-                s += FREE;
-            else
-                s += this->map[row][col]->get_char();
-        }
-    return s;
-}
-
-string table::solve_bfs() const {
-    if (this->is_invalid || this->ptr_player == nullptr)
-        return "INVALID MAP DATA";
-
-    struct state {
-        table t;
-        pair<int, int> dir;
-        string log;
-    };
-
-    table t = *this;
-    queue<state*> q;
-    unordered_set<string> visited;
-
-    state* next_state = new state{ t, dirs[0], ""};
-    q.push(next_state);
-    visited.insert(next_state->t.get_string());
-
-    while (!q.empty()) {
-        state* cur_state = q.front();
-        if (cur_state->t.is_solved()) {
-            string result = cur_state->log;
-            while (!q.empty()) {
-                delete q.front();
-                q.pop();
-            }
-            return result;
-        }
-        if (cur_state->t.is_stuck()) {
-            delete q.front();
-            q.pop();
-            continue;
-        }
-
-        for (auto d : dirs) {
-            if (cur_state->t.ptr_player->is_movable(cur_state->t, d)) {
-                state* next_state = new state{ cur_state->t, d, cur_state->log };
-                next_state->t.ptr_player->move(next_state->t, d, false);
-                next_state->log += dir_to_char(d);
-                string table_string = next_state->t.get_string();
-                if (visited.find(table_string) == visited.end()) {
-                    q.push(next_state);
-                    visited.insert(table_string);
-                }
-                else
-                    delete next_state;
-            }
-        }
-        delete q.front();
-        q.pop();
-    }
-
-    return "NO SOLUTION";
-}
+//bool table::is_stuck() const {
+//    size_t num_boxes = 0;
+//    for (int row = 0; row < this->height; row++)
+//        for (int col = 0; col < this->width; col++) {
+//            if (this->map[row][col] == nullptr || this->map[row][col]->get_char() != BOX)
+//                continue;
+//            num_boxes++;
+//            if (this->has_storage_at(row, col))
+//                continue;
+//            bool unmovable = false;
+//            for (int i = 0; i < 5; i++) {
+//                int new_row = row + dirs[i % 4].first,
+//                    new_col = col + dirs[i % 4].second;
+//                if (new_row < 0 || new_row >= this->height || new_col < 0 || new_col >= this->width ||
+//                        (this->map[new_row][new_col] != nullptr && this->map[new_row][new_col]->get_char() == WALL)) {
+//                    if (unmovable) {
+//                        num_boxes--;
+//                        break;
+//                    }
+//                    else
+//                        unmovable = true;
+//                }
+//                else
+//                    unmovable = false;
+//            }
+//        }
+//    if (num_boxes < this->storages.size())
+//        return true;
+//    else
+//        return false;
+//}
+//
+//string table::get_string() const {
+//    string s;
+//    for (int row = 0; row < this->height; row++)
+//        for (int col = 0; col < this->width; col++) {
+//            if (this->map[row][col] == nullptr)
+//                s += FREE;
+//            else
+//                s += this->map[row][col]->get_char();
+//        }
+//    return s;
+//}
+//
+//string table::solve_bfs() const {
+//    if (this->is_invalid || this->ptr_player == nullptr)
+//        return "INVALID MAP DATA";
+//
+//    struct state {
+//        table t;
+//        pair<int, int> dir;
+//        string log;
+//    };
+//
+//    table t = *this;
+//    queue<state*> q;
+//    unordered_set<string> visited;
+//
+//    state* next_state = new state{ t, dirs[0], ""};
+//    q.push(next_state);
+//    visited.insert(next_state->t.get_string());
+//
+//    while (!q.empty()) {
+//        state* cur_state = q.front();
+//        if (cur_state->t.is_solved()) {
+//            string result = cur_state->log;
+//            while (!q.empty()) {
+//                delete q.front();
+//                q.pop();
+//            }
+//            return result;
+//        }
+//        if (cur_state->t.is_stuck()) {
+//            delete q.front();
+//            q.pop();
+//            continue;
+//        }
+//
+//        for (auto d : dirs) {
+//            if (cur_state->t.ptr_player->is_movable(cur_state->t, d)) {
+//                state* next_state = new state{ cur_state->t, d, cur_state->log };
+//                next_state->t.ptr_player->move(next_state->t, d, false);
+//                next_state->log += dir_to_char(d);
+//                string table_string = next_state->t.get_string();
+//                if (visited.find(table_string) == visited.end()) {
+//                    q.push(next_state);
+//                    visited.insert(table_string);
+//                }
+//                else
+//                    delete next_state;
+//            }
+//        }
+//        delete q.front();
+//        q.pop();
+//    }
+//
+//    return "NO SOLUTION";
+//}

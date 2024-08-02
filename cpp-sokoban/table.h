@@ -22,13 +22,12 @@ public:
     int get_width() const { return this->width; }
     void draw_table() const;
     player* get_player() { return this->ptr_player; }
-    void set_player(player* p) { this->ptr_player = p; }
     block* get_block(int const r, int const c) { return this->map[r][c]; }
     void set_block(int const r, int const c, block* b) { this->map[r][c] = b; }
     bool has_storage_at(int const r, int const c) const;
     bool is_solved() const;
-    bool is_stuck() const;
-    std::string get_string() const;
-    std::string solve_bfs() const;
+//    bool is_stuck() const;
+//    std::string get_string() const;
+//    std::string solve_bfs() const;
 };
 

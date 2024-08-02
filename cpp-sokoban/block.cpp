@@ -81,8 +81,6 @@ void box::move(table& tbl, pair<int, int> const& dir, bool update_flag) {
             gotorc(tbl.get_height(), 0);
             if (tbl.is_solved())
                 cout << "CLEAR";
-            else if (tbl.is_stuck())
-                cout << "STUCK";
             else
                 cout << "     ";
         }
