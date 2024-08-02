@@ -6,15 +6,16 @@ using namespace std;
 
 solver::solver(vector<string> const& d) : stage_data(d), pos_player({ -1, -1 }) {
     for (size_t row = 0; row < d.size(); row++)
-        for (size_t col = 0; col < d[0].size(); col++)
+        for (size_t col = 0; col < d[0].size(); col++) {
             if (d[row][col] == '@' || d[row][col] == '+') {
                 if (pos_player == make_pair(-1, -1))
                     pos_player = { row, col };
                 else
                     is_invalid = true;
             }
-            else if (d[row][col] == '.' || d[row][col] == '*')
+            if (d[row][col] == '.' || d[row][col] == '*' || d[row][col] == '+')
                 pos_storages.push_back({ row, col });
+        }
     if (pos_player == make_pair(-1, -1))
         is_invalid = true;
 }
