@@ -248,20 +248,26 @@ int main() {
             t->draw_table();
             if (t->is_invalid)
                 continue;
-            gotorc(t->get_height() + 1, 0);
-            cout << "CALCULATING...";
+            gotorc(t->get_height(), 0);
+            cout << "SEARCHING...  ";
             solver s(stages_data[current_stage]);
             clock_t solver_start = clock();
-            string answer = s.solve_bfs();
+            string solution = s.solve_bfs();
             clock_t solver_end = clock();
+            gotorc(t->get_height(), 0);
+            cout << "SOLUTION FOUND";
             gotorc(t->get_height() + 1, 0);
-            cout << "duration: " << (double)(solver_end - solver_start) / CLOCKS_PER_SEC << "s";
-            gotorc(t->get_height() + 2, 0);
-            if (answer == "NO SOLUTION") {
+            cout << (double)(solver_end - solver_start) / CLOCKS_PER_SEC << "s";
+            if (solution == "NO SOLUTION") {
+                gotorc(t->get_height(), 0);
                 cout << "NO SOLUTION   ";
                 continue;
             }
-            for (char c : answer) {
+            else {
+                gotorc(t->get_height() + 2, 0);
+                cout << solution.length() << " moves";
+            }
+            for (char c : solution) {
                 if (c == 'U')
                     t->get_player()->move(*t, dirs[UP]);
                 else if (c == 'D')
@@ -270,9 +276,8 @@ int main() {
                     t->get_player()->move(*t, dirs[LEFT]);
                 else
                     t->get_player()->move(*t, dirs[RIGHT]);
-                Sleep(300);
+                Sleep(200);
             }
-            gotorc(t->get_height() + 1, 0);
         }
 //        else
 //            cout << input << endl;

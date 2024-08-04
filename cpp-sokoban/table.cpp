@@ -36,7 +36,7 @@ table::table(int const h, int const w, vector<string> const& data)
                 v.push_back(new box(row, col));
                 break;
             case STORAGE:
-                this->storages.push_back({ row, col });
+                this->storages.push_back({row, col});
                 v.push_back(nullptr);
                 break;
             case PLAYER_S:
@@ -49,10 +49,10 @@ table::table(int const h, int const w, vector<string> const& data)
                     this->is_invalid = false;
                     v.push_back(this->ptr_player);
                 }
-                this->storages.push_back({ row, col });
+                this->storages.push_back({row, col});
                 break;
             case BOX_S:
-                this->storages.push_back({ row, col });
+                this->storages.push_back({row, col});
                 v.push_back(new box(row, col));
                 break;
             case FREE:
@@ -152,7 +152,7 @@ void table::draw_table() const {
     }
     gotorc(this->height, 0);
     if (this->is_solved())
-        cout << "CLEAR";
+        cout << "CLEAR         ";
 }
 
 bool table::has_storage_at(int const r, int const c) const {

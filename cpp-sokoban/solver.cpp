@@ -4,6 +4,9 @@
 
 using namespace std;
 
+extern pair<int, int> dirs[4];
+char dir_to_char(pair<int, int> const& dir);
+
 solver::solver(vector<string> const& d) : stage_data(d), pos_player({ -1, -1 }) {
     for (size_t row = 0; row < d.size(); row++)
         for (size_t col = 0; col < d[0].size(); col++) {
@@ -20,70 +23,42 @@ solver::solver(vector<string> const& d) : stage_data(d), pos_player({ -1, -1 }) 
         is_invalid = true;
 }
 
-solver::solver(solver const& other) {
-    this->stage_data = other.stage_data;
-    this->pos_player = other.pos_player;
-    this->pos_storages = other.pos_storages;
-    this->is_invalid = other.is_invalid;
-}
-
-solver& solver::operator=(solver const& other) {
-    this->stage_data = other.stage_data;
-    this->pos_player = other.pos_player;
-    this->pos_storages = other.pos_storages;
-    this->is_invalid = other.is_invalid;
-    return *this;
-}
-
-bool solver::is_pushable(int const row, int const col, pair<int, int> const& dir) const {
+bool solver::is_movable(int const row, int const col, pair<int, int> const& dir) {
     int new_row = row + dir.first,
         new_col = col + dir.second;
     if (new_row < 0 || new_row >= this->stage_data.size() ||
-        new_col < 0 || new_row >= this->stage_data[0].size())
+        new_col < 0 || new_col >= this->stage_data[0].size())
         return false;
-    if (this->stage_data[new_row][new_col] == ' ' ||
-            this->stage_data[new_row][new_col] == '.')
-        return true;
-    return false;
-}
 
-bool solver::is_movable(pair<int, int> const& dir) {
-    int new_row = this->pos_player.first + dir.first,
-        new_col = this->pos_player.second + dir.second;
-    if (new_row < 0 || new_row >= this->stage_data.size() ||
-        new_col < 0 || new_row >= this->stage_data[0].size())
-        return false;
     if (this->stage_data[new_row][new_col] == ' ' || this->stage_data[new_row][new_col] == '.')
         return true;
-    if (this->stage_data[new_row][new_col] == '$' && this->is_pushable(new_row, new_col, dir))
-        return true;
-    if (this->stage_data[new_row][new_col] == '*' && this->is_pushable(new_row, new_col, dir))
-        return true;
+    if (this->stage_data[row][col] != '$' && this->stage_data[row][col] != '*') {
+        if (this->stage_data[new_row][new_col] == '$' && this->is_movable(new_row, new_col, dir))
+            return true;
+        if (this->stage_data[new_row][new_col] == '*' && this->is_movable(new_row, new_col, dir))
+            return true;
+    }
     return false;
 }
 
 void solver::move(pair<int, int> const& dir) {
     int row = this->pos_player.first,
         col = this->pos_player.second;
+    if (!this->is_movable(row, col, dir))
+        return;
     int new_row = row + dir.first,
         new_col = col + dir.second;
-    if (new_row < 0 || new_row >= this->stage_data.size() ||
-        new_col < 0 || new_row >= this->stage_data[0].size())
-        return;
     bool flag_pushed = false;
     if (this->stage_data[new_row][new_col] == ' ')
         this->stage_data[new_row][new_col] = '@';
     else if (this->stage_data[new_row][new_col] == '.')
         this->stage_data[new_row][new_col] = '+';
-    else if (this->stage_data[new_row][new_col] == '$' &&
-        this->is_pushable(new_row, new_col, dir)) {
-        this->stage_data[new_row][new_col] = '@';
+    else if (this->is_movable(new_row, new_col, dir)) {
         flag_pushed = true;
-    }
-    else if (this->stage_data[new_row][new_col] == '*' &&
-        this->is_pushable(new_row, new_col, dir)) {
-        this->stage_data[new_row][new_col] = '+';
-        flag_pushed = true;
+        if (this->stage_data[new_row][new_col] == '$')
+            this->stage_data[new_row][new_col] = '@';
+        else if (this->stage_data[new_row][new_col] == '*')
+            this->stage_data[new_row][new_col] = '+';
     }
     else
         return;
@@ -108,8 +83,6 @@ bool solver::is_solved() const {
             return false;
     return true;
 }
-
-extern pair<int, int> dirs[4];
 
 bool solver::is_stuck() const {
     size_t num_boxes = 0;
@@ -152,8 +125,6 @@ string solver::get_string() const {
     return ret;
 }
 
-char dir_to_char(pair<int, int> const& dir);
-
 string solver::solve_bfs() const {
     if (this->is_invalid)
         return "INVALID MAP DATA";
@@ -168,7 +139,7 @@ string solver::solve_bfs() const {
     queue<state*> q;
     unordered_set<string> visited;
 
-    state* next_state = new state{ t, dirs[0], ""};
+    state* next_state = new state{ t, {0, 0}, "" };
     q.push(next_state);
     visited.insert(next_state->t.get_string());
 
@@ -189,7 +160,7 @@ string solver::solve_bfs() const {
         }
 
         for (auto d : dirs) {
-            if (cur_state->t.is_movable(d)) {
+            if (cur_state->t.is_movable(cur_state->t.pos_player.first, cur_state->t.pos_player.second, d)) {
                 state* next_state = new state{ cur_state->t, d, cur_state->log };
                 next_state->t.move(d);
                 next_state->log += dir_to_char(d);
