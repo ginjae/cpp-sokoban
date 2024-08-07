@@ -131,7 +131,6 @@ string solver::solve_bfs() const {
 
     struct state {
         solver t;
-        pair<int, int> dir;
         string log;
     };
 
@@ -139,7 +138,7 @@ string solver::solve_bfs() const {
     queue<state*> q;
     unordered_set<string> visited;
 
-    state* next_state = new state{ t, {0, 0}, "" };
+    state* next_state = new state{ t, "" };
     q.push(next_state);
     visited.insert(next_state->t.get_string());
 
@@ -161,7 +160,7 @@ string solver::solve_bfs() const {
 
         for (auto d : dirs) {
             if (cur_state->t.is_movable(cur_state->t.pos_player.first, cur_state->t.pos_player.second, d)) {
-                state* next_state = new state{ cur_state->t, d, cur_state->log };
+                state* next_state = new state{ cur_state->t, cur_state->log };
                 next_state->t.move(d);
                 next_state->log += dir_to_char(d);
                 string table_string = next_state->t.get_string();

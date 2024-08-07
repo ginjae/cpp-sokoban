@@ -6,10 +6,10 @@
 class solver {
 public:
     std::vector<std::string> stage_data;
-    std::pair<int, int> pos_player = { -1, -1 };
+    std::pair<int, int> pos_player;
     std::vector<std::pair<int, int>> pos_storages;
     bool is_invalid = false;
-    solver(std::vector<std::string> const &d);
+    solver(std::vector<std::string> const& d);
     bool is_movable(int const row, int const col, std::pair<int, int> const& dir);
     void move(std::pair<int, int> const& dir);
     bool is_solved() const;
