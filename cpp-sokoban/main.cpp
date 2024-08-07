@@ -129,23 +129,34 @@ int main() {
     for (int stage_i = 0; stage_i < path_stages.size(); stage_i++) {
         ifstream readFile(path_stages[stage_i]);
         if (readFile.is_open()) {
-            int height, width;
-            readFile >> height >> width;
+            int height = 0, width = 0;
+            vector<string> stage_data;
+            string line;
+            while (readFile.peek() != EOF) {
+                getline(readFile, line);
+                height++;
+                width = max(width, line.size());
+                stage_data.push_back(line);
+            }
+            for (string& line : stage_data) {
+                if (line.size() > width)
+                    line = line.substr(0, width);
+                while (line.size() < width)
+                    line += ' ';
+            }
+//            for (int i = 0; i < height; i++) {
+//                string str;
+//                getline(readFile, str);
+//                if (str.size() > width)
+//                    str = str.substr(0, width);
+//                while (str.size() < width) {
+//                    str += ' ';
+//                }
+//                stage_data.push_back(str);
+//            }
+            stages_data.push_back(stage_data);
             stages_height.push_back(height);
             stages_width.push_back(width);
-            readFile.get(); // get newline char
-            vector<string> stage_data;
-            for (int i = 0; i < height; i++) {
-                string str;
-                getline(readFile, str);
-                if (str.size() > width)
-                    str = str.substr(0, width);
-                while (str.size() < width) {
-                    str += ' ';
-                }
-                stage_data.push_back(str);
-            }
-            stages_data.push_back(stage_data);
             readFile.close();
         }
     }

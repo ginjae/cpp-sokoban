@@ -25,7 +25,6 @@ table::table(int const h, int const w, vector<string> const& data)
                 }
                 else {
                     this->ptr_player = new player(row, col);
-                    this->is_invalid = false;
                     v.push_back(this->ptr_player);
                 }
                 break;
@@ -46,7 +45,6 @@ table::table(int const h, int const w, vector<string> const& data)
                 }
                 else {
                     this->ptr_player = new player(row, col);
-                    this->is_invalid = false;
                     v.push_back(this->ptr_player);
                 }
                 this->storages.push_back({row, col});

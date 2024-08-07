@@ -13,7 +13,7 @@ private:
     std::vector<std::pair<int, int>> storages;
     std::vector<std::vector<block*>> map;
 public:
-    bool is_invalid = true;
+    bool is_invalid = false;
     table(int const h, int const w, std::vector<std::string> const& data);
     ~table();
     table(table const& other);
