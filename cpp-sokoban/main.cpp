@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <conio.h>
 #include <filesystem>
-#include <ctime>
 #include "block.h"
 #include "table.h"
 #include "solver.h"
@@ -144,16 +143,6 @@ int main() {
                 while (line.size() < width)
                     line += ' ';
             }
-//            for (int i = 0; i < height; i++) {
-//                string str;
-//                getline(readFile, str);
-//                if (str.size() > width)
-//                    str = str.substr(0, width);
-//                while (str.size() < width) {
-//                    str += ' ';
-//                }
-//                stage_data.push_back(str);
-//            }
             stages_data.push_back(stage_data);
             stages_height.push_back(height);
             stages_width.push_back(width);
