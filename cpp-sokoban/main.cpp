@@ -66,13 +66,14 @@ const string MANUAL[] = {
     "| [r] - restart the stage                         |",
     "| [n] - go to next stage                          |",
     "| [b] - go to previous stage                      |",
-    "| [s] - solve the stage                           |",
+    "| [1] - solve the stage (BFS)                     |",
+    "| [2] - solve the stage (A*)                      |",
     "| [e] - exit                                      |",
     "+-------------------------------------------------+"
 };
 
 
-void init(vector<string> const& path_stages) {
+void init(vector<string> const& path_stages, int current_stage) {
 //    SetConsoleTitle(TEXT("SOKOBAN"));
 
     HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -97,6 +98,8 @@ void init(vector<string> const& path_stages) {
             cout << "|  " << s << "|";
         }
     }
+    gotorc(current_stage + 1, MAX_MAP_WIDTH + 3);
+    cout << "->";
 
     for (size_t i = 0; i < sizeof MANUAL / sizeof MANUAL[0]; i++) {
         gotorc((int)i, MAX_MAP_WIDTH + 21);
@@ -149,11 +152,9 @@ int main() {
             readFile.close();
         }
     }
-    init(path_stages);
+    init(path_stages, current_stage);
     table* t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
     t->draw_table();
-    gotorc(current_stage + 1, MAX_MAP_WIDTH + 3);
-    cout << "->";
 
     int input;
     while (1) {
@@ -181,12 +182,9 @@ int main() {
         else if (input == 114) {    // r
             delete t;
 
-            for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
-                gotorc(i, 0);
-                cout << string(MAX_MAP_WIDTH, ' ');
-            }
+            system("cls");
+            init(path_stages, current_stage);
 
-            gotorc(0, 0);
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
             t->draw_table();
         }
@@ -197,20 +195,10 @@ int main() {
                 continue;
             delete t;
 
-            for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
-                gotorc(i, 0);
-                cout << string(MAX_MAP_WIDTH, ' ');
-            }
-
-            gotorc(current_stage + 1, MAX_MAP_WIDTH + 3);
-            cout << "  ";
-            
             current_stage++;
+            system("cls");
+            init(path_stages, current_stage);
 
-            gotorc(current_stage + 1, MAX_MAP_WIDTH + 3);
-            cout << "->";
-
-            gotorc(0, 0);
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
             t->draw_table();
         }
@@ -219,32 +207,18 @@ int main() {
                 continue;
             delete t;
 
-            for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
-                gotorc(i, 0);
-                cout << string(MAX_MAP_WIDTH, ' ');
-            }
-
-            gotorc(current_stage + 1, MAX_MAP_WIDTH + 3);
-            cout << "  ";
-
             current_stage--;
+            system("cls");
+            init(path_stages, current_stage);
 
-
-            gotorc(current_stage + 1, MAX_MAP_WIDTH + 3);
-            cout << "->";
-
-            gotorc(0, 0);
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
             t->draw_table();
         }
-        else if (input == 115) {    // s
+        else if (input == 49) {    // 1
             delete t;
             t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
-            for (int i = 0; i <= MAX_MAP_HEIGHT + 3; i++) {
-                gotorc(i, 0);
-                cout << string(MAX_MAP_WIDTH, ' ');
-            }
-            gotorc(0, 0);
+            system("cls");
+            init(path_stages, current_stage);
             t->draw_table();
             if (t->is_invalid)
                 continue;
@@ -254,17 +228,58 @@ int main() {
             clock_t solver_start = clock();
             string solution = s.solve_bfs();
             clock_t solver_end = clock();
+            gotorc(20, 0);
+            cout << "BFS: " << (double)(solver_end - solver_start) / CLOCKS_PER_SEC << "s" << '\n' << '\n';
+            cout << solution;
             gotorc(t->get_height(), 0);
             cout << "SOLUTION FOUND";
-            gotorc(t->get_height() + 1, 0);
-            cout << (double)(solver_end - solver_start) / CLOCKS_PER_SEC << "s";
             if (solution == "NO SOLUTION") {
                 gotorc(t->get_height(), 0);
                 cout << "NO SOLUTION   ";
                 continue;
             }
             else {
-                gotorc(t->get_height() + 2, 0);
+                gotorc(21, 0);
+                cout << solution.length() << " moves";
+            }
+            for (char c : solution) {
+                if (c == 'U')
+                    t->get_player()->move(*t, dirs[UP]);
+                else if (c == 'D')
+                    t->get_player()->move(*t, dirs[DOWN]);
+                else if (c == 'L')
+                    t->get_player()->move(*t, dirs[LEFT]);
+                else
+                    t->get_player()->move(*t, dirs[RIGHT]);
+                Sleep(200);
+            }
+        }
+        else if (input == 50) {    // 2
+            delete t;
+            t = new table(stages_height[current_stage], stages_width[current_stage], stages_data[current_stage]);
+            system("cls");
+            init(path_stages, current_stage);
+            t->draw_table();
+            if (t->is_invalid)
+                continue;
+            gotorc(t->get_height(), 0);
+            cout << "SEARCHING...  ";
+            solver s(stages_data[current_stage]);
+            clock_t solver_start = clock();
+            string solution = s.solve_astar();
+            clock_t solver_end = clock();
+            gotorc(20, 0);
+            cout << "A*: " << (double)(solver_end - solver_start) / CLOCKS_PER_SEC << "s" << '\n' << '\n';
+            cout << solution;
+            gotorc(t->get_height(), 0);
+            cout << "SOLUTION FOUND";
+            if (solution == "NO SOLUTION") {
+                gotorc(t->get_height(), 0);
+                cout << "NO SOLUTION   ";
+                continue;
+            }
+            else {
+                gotorc(21, 0);
                 cout << solution.length() << " moves";
             }
             for (char c : solution) {
